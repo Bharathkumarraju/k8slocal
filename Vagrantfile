@@ -1,13 +1,21 @@
-NUM_SLAVES=(ENV['NUM_SLAVES'] || 2).to_i()
+required_plugins = %w(vagrant-ignition vagrant-vbguest vagrant-disksize)
+plugins_to_install = required_plugins.select { |plugin| not Vagrant.has_plugin? plugin }
+if not plugins_to_install.empty?
+  puts "Installing plugins: #{plugins_to_install.join(' ')}"
+  if system "vagrant plugin install #{plugins_to_install.join(' ')}"
+    exec "vagrant #{ARGV.join(' ')}"
+  else
+    abort "Installation of one or more plugins has failed. Aborting."
+  end
+end
 
+
+NUM_SLAVES=(ENV['NUM_SLAVES'] || 2).to_i()
 SUBNET=(ENV['SUBNET'] || "192.168.33")
 IP_BASE=100
-
 MASTER_IP="#{SUBNET}.#{IP_BASE}"
-
 MASTER_MEMORY=(ENV['MASTER_MEMORY'] || 1024).to_i()
 NODE_MEMORY=(ENV['NODE_MEMORY'] || 1024).to_i()
-
 SSH_PORT_BASE=5678
 
 
