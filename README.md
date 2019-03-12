@@ -13,13 +13,18 @@ vagrant plugin install vagrant-disksize
 ### Default Settings
 ```
 So I am using subnet as 192.168.33.0/24
-and MASTER_IP: 192.168.33.100 
+and MASTER_IP: 192.168.33.100  and NODE_IPS are 100+1 and so on i.e. 192.168.33.101, 192.168.33.102 etc..
 ```
 
 
 ### Run Vagrant Boom.........!!!
 ```
 vagrant up
+```
+
+### Login to VM boxes
+```
+vagrant ssh k8s.master.com    and vagrant ssh k8s.node-1.com , vagrant ssh k8s.node-2.com
 ```
 
 #### Graceful restart of VM's
