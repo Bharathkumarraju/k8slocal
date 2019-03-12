@@ -15,3 +15,8 @@ vagrant plugin install vagrant-disksize
 ```
 vagrant up
 ```
+
+#### Graceful restart of VM's
+```
+vagrant reload --provision
+```
