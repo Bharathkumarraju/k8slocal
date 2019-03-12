@@ -1,4 +1,4 @@
-required_plugins = %w(vagrant-ignition vagrant-vbguest vagrant-disksize)
+required_plugins = %w(vagrant-ignition vagrant-vbguest vagrant-disksize vagrant-cachier)
 plugins_to_install = required_plugins.select { |plugin| not Vagrant.has_plugin? plugin }
 if not plugins_to_install.empty?
   puts "Installing plugins: #{plugins_to_install.join(' ')}"
@@ -22,11 +22,8 @@ SSH_PORT_BASE=5678
 
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "bento/centos-7.6"
-  config.vm.provision :shell, path: "bootstrap.sh"
-  if Vagrant.has_plugin?("vagrant-disksize")
-     config.disksize.size = '20GB'
-  end
+     config.vm.box = "bento/centos-7.6"
+     config.vm.provision :shell, path: "bootstrap.sh"
   
   config.vm.define "k8s.master.com", primary: true do |master|
     master.vm.hostname = 'k8s.master.com'
@@ -52,4 +49,9 @@ Vagrant.configure("2") do |config|
       end
     end
   end
+
+  if Vagrant.has_plugin?("vagrant-cachier")
+    config.cache.scope = :box
+  end
+
  end
