@@ -10,6 +10,12 @@ Vagrant Latest version https://releases.hashicorp.com/vagrant/2.2.4/vagrant_2.2.
 vagrant plugin install vagrant-vbguest
 vagrant plugin install vagrant-disksize
 ```
+### Default Settings
+```
+So I am using subnet as 192.168.33.0/24
+and MASTER_IP: 192.168.33.100 
+```
+
 
 ### Run Vagrant Boom.........!!!
 ```
