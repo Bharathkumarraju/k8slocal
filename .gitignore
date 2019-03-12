@@ -2,4 +2,8 @@
 .vagrant*
 .vagrant.*
 .git
+.idea
+.idea.*
+.idea*
+*.iml
 
