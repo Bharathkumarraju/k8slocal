@@ -8,12 +8,35 @@ MASTER_IP="#{SUBNET}.#{IP_BASE}"
 MASTER_MEMORY=(ENV['MASTER_MEMORY'] || 1024).to_i()
 NODE_MEMORY=(ENV['NODE_MEMORY'] || 1024).to_i()
 
+SSH_PORT_BASE=5678
 
 
 Vagrant.configure("2") do |config|
   config.vm.box = "bento/centos-7.6"
   config.vm.provision :shell, path: "bootstrap.sh"
+  
+  config.vm.define "k8s.master.com", primary: true do |master|
+    master.vm.hostname = 'k8s.master.com'
+    master.vm.network :private_network, ip: MASTER_IP
+    master.vm.network :forwarded_port, guest: 22, host: SSH_PORT_BASE, id: "ssh"
+    master.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      v.customize ["modifyvm", :id, "--memory", MASTER_MEMORY]
+      v.customize ["modifyvm", :id, "--name", "k8s.master.com"]
+    end
+  end
 
-
-
-end
+  (1..NUM_SLAVES).each do |i|
+    hostname="k8s.node-#{i}.com"
+    config.vm.define hostname do |node|
+      node.vm.hostname = hostname
+      node.vm.network :private_network, ip: "#{SUBNET}.#{i+IP_BASE}"
+      node.vm.network :forwarded_port, guest: 22, host: (SSH_PORT_BASE+i), id: "ssh"
+      node.vm.provider :virtualbox do |v|
+        v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+        v.customize ["modifyvm", :id, "--memory", NODE_MEMORY]
+        v.customize ["modifyvm", :id, "--name", hostname]
+      end
+    end
+  end
+ end
