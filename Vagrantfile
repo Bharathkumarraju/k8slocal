@@ -10,6 +10,8 @@ if not plugins_to_install.empty?
 end
 
 
+
+
 NUM_SLAVES=(ENV['NUM_SLAVES'] || 2).to_i()
 SUBNET=(ENV['SUBNET'] || "192.168.33")
 IP_BASE=100
@@ -22,6 +24,9 @@ SSH_PORT_BASE=5678
 Vagrant.configure("2") do |config|
   config.vm.box = "bento/centos-7.6"
   config.vm.provision :shell, path: "bootstrap.sh"
+  if Vagrant.has_plugin?("vagrant-disksize")
+     config.disksize.size = '20GB'
+  end
   
   config.vm.define "k8s.master.com", primary: true do |master|
     master.vm.hostname = 'k8s.master.com'
