@@ -1,5 +1,6 @@
 - hosts: all
-  connection: ssh
+  become: yes
+  become_method: sudo
 
 
 

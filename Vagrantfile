@@ -25,10 +25,12 @@ Vagrant.configure("2") do |config|
      config.vm.box = "centos/7"
      config.vm.provision :shell, path: "bootstrap.sh"
      config.disksize.size = '42GB' 
- 
+
+  config.vm.provision "docker" 
   config.ssh.insert_key = false
   config.vm.provision "ansible" do |ansible|
     ansible.verbose = "v"
+    ansible.become = true
     ansible.playbook = "playbook.yml"
   end
   
