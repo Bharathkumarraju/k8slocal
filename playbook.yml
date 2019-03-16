@@ -1,0 +1,12 @@
+- hosts: all
+  connection: ssh
+
+
+
+  tasks:
+  - name: My first task
+    shell: echo "Hello Playbook"
+    register: res
+
+  - name: Debug playbook
+    debug: var=res
