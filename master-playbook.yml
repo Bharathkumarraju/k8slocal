@@ -12,6 +12,10 @@
   - name: Display gathered facts
     debug: var=res
 
+  - name: Disabling SELINUX 
+    selinux:
+     state: disabled
+
   - name: Install packages that allow yum to be used over HTTPS
     yum:
       name: "{{ packages }}"
@@ -64,4 +68,23 @@
 
   - name: Disable swap
     command: swapoff -a
+
+  - name: Add yum repository for stable version
+    yum_repository:
+      name: kubernetes 
+      description: Kubernetes Repository
+      baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64 
+      gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg 
+      state: present 
+
+  - name: Install Kubernetes binaries
+    yum: 
+      name: "{{ packages }}"
+      state: present
+      update_cache: yes
+    vars:
+      packages:
+        - kubelet 
+        - kubeadm 
+        - kubectl
 
