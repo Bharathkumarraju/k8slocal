@@ -1,6 +1,7 @@
 ---
 - hosts: all
   become: true
+  become_method: sudo
   gather_facts: yes
 
   tasks:
@@ -15,6 +16,9 @@
   - name: Disabling SELINUX 
     selinux:
      state: disabled
+
+  - name: Run Setenforce command
+    command: sudo setenforce 0
 
   - name: Install packages that allow yum to be used over HTTPS
     yum:
