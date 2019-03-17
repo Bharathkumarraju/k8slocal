@@ -35,6 +35,7 @@ Vagrant.configure("2") do |config|
     master.vm.provider :virtualbox do |v|
       v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
       v.customize ["modifyvm", :id, "--memory", MASTER_MEMORY]
+      v.customize ["modifyvm", :id, "--cpus", 3]
       v.customize ["modifyvm", :id, "--name", "k8s.master.com"]
     end
     master.vm.provision "ansible" do |ansible|

@@ -1,7 +1,6 @@
 ---
 - hosts: all
   become: true
-  become_method: sudo
   gather_facts: yes
 
   tasks:
@@ -18,7 +17,30 @@
      state: disabled
 
   - name: Run Setenforce command
-    command: sudo setenforce 0
+    become_method: sudo
+    command: setenforce 0
+
+  - name: Flush existing firewall rules
+    become_method: sudo
+    iptables:
+      flush: true
+
+  - name: Add the net bridge in sysctl
+    become_method: sudo
+    lineinfile:
+      path: /etc/sysctl.conf
+      regexp: '^net.bridge.bridge-nf-call-iptables='
+      line: 'net.bridge.bridge-nf-call-iptables=1'
+
+  - name: Add the kernel module
+    become_method: sudo
+    modprobe:
+      name:  br_netfilter
+      state: present
+
+  - name: execute sysctl
+    become_method: sudo
+    command: sysctl -p
 
   - name: Install packages that allow yum to be used over HTTPS
     yum:
@@ -36,12 +58,8 @@
       - yum-utils
 
   - name: Add yum repository for stable version
-    yum_repository:
-      name: Dockerce
-      description: Docker CE Repository
-      baseurl: https://yum.dockerproject.org/repo/main/centos/7 
-      gpgkey: https://yum.dockerproject.org/gpg 
-      state: present 
+    become_method: sudo
+    command: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
   - name: Install docker and its dependecies
     yum: 
@@ -50,16 +68,21 @@
       update_cache: yes
     vars:
       packages:
-      - docker-ce 
-      - docker-ce-cli 
+      - docker-ce
+      - docker-ce-cli
       - containerd.io
-    notify:
-      - docker status
 
   - name: Add vagrant user to docker group
     user:
       name: vagrant
       group: docker
+
+  - name: Make sure a docker service is running
+    systemd:
+      state: started
+      name: docker 
+      enabled: yes
+
  
   - name: Remove swapfile from /etc/fstab
     mount:
@@ -92,3 +115,18 @@
         - kubeadm 
         - kubectl
 
+  - name: Make sure a kubelet service is running
+    systemd:
+      state: started
+      name: kubelet 
+      enabled: yes
+
+  - name: Set  Master IP
+    shell: ip a | grep -i "eth" | grep -i "inet" | grep "192" | awk '{print $2}' | awk -F'/' '{print $1}'
+    register: masterip
+
+  - name: Get Master Ip
+    shell: echo "master ip is " {{ masterip.stdout }} 
+
+  - name: Initialize the Kubernetes cluster using kubeadm
+    command: kubeadm init --apiserver-advertise-address="{{ masterip.stdout }}" --apiserver-cert-extra-sans="{{ masterip.stdout }}"  --node-name k8s.master.com --pod-network-cidr=192.168.0.0/16
