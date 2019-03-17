@@ -25,15 +25,9 @@ Vagrant.configure("2") do |config|
      config.vm.box = "centos/7"
      config.vm.provision :shell, path: "bootstrap.sh"
      config.disksize.size = '42GB' 
-
-  config.vm.provision "docker" 
   config.ssh.insert_key = false
-  config.vm.provision "ansible" do |ansible|
-    ansible.verbose = "v"
-    ansible.become = true
-    ansible.playbook = "playbook.yml"
-  end
-  
+ 
+ 
   config.vm.define "k8s.master.com", primary: true do |master|
     master.vm.hostname = 'k8s.master.com'
     master.vm.network :private_network, ip: MASTER_IP
@@ -43,7 +37,13 @@ Vagrant.configure("2") do |config|
       v.customize ["modifyvm", :id, "--memory", MASTER_MEMORY]
       v.customize ["modifyvm", :id, "--name", "k8s.master.com"]
     end
+    master.vm.provision "ansible" do |ansible|
+           ansible.verbose = "v" 
+           ansible.become = true
+           ansible.playbook = "master-playbook.yml"
+    end
   end
+
 
   (1..NUM_SLAVES).each do |i|
     hostname="k8s.node-#{i}.com"

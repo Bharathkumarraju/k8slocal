@@ -1,0 +1,44 @@
+---
+- hosts: all
+  become: true
+  tasks:
+  - name: Install packages that allow yum to be used over HTTPS
+    yum:
+      name: "{{ packages }}"
+      state: present
+      update_cache: yes
+    vars:
+      packages:
+      - varnish 
+      - ca-certificates
+      - curl
+      - gnupg
+      - device-mapper-persistent-data
+      - lvm2
+      - yum-utils
+
+  - name: Add yum repository for stable version
+    yum_repository:
+      name: Dockerce
+      description: Docker CE Repository
+      baseurl: https://download.docker.com/linux/centos/docker-ce.repo 
+      gpgkey: https://download.docker.com/linux/centos/gpg
+      state: present
+
+  - name: Install docker and its dependecies
+    yum: 
+      name: "{{ packages }}"
+      state: present
+      update_cache: yes
+    vars:
+      packages:
+      - docker-ce 
+      - docker-ce-cli 
+      - containerd.io
+    notify:
+      - docker status
+
+  - name: Add vagrant user to docker group
+    user:
+      name: vagrant
+      group: docker
