@@ -1,8 +1,7 @@
 - hosts: all
   become: yes
   become_method: sudo
-
-
+  gather_facts: yes
 
   tasks:
   - name: My first task
@@ -11,3 +10,13 @@
 
   - name: Debug playbook
     debug: var=res
+
+  - name: Gather all facts
+    setup:
+        gather_subset:
+          - 'all'
+    register: res1
+
+  - name: Display gathered facts
+    debug: var=res1
+         
