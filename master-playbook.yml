@@ -1,6 +1,7 @@
 ---
 - hosts: all
   become: true
+
   tasks:
   - name: Install packages that allow yum to be used over HTTPS
     yum:
@@ -21,9 +22,9 @@
     yum_repository:
       name: Dockerce
       description: Docker CE Repository
-      baseurl: https://download.docker.com/linux/centos/docker-ce.repo 
-      gpgkey: https://download.docker.com/linux/centos/gpg
-      state: present
+      baseurl: https://yum.dockerproject.org/repo/main/centos/7 
+      gpgkey: https://yum.dockerproject.org/gpg 
+      state: present 
 
   - name: Install docker and its dependecies
     yum: 
@@ -42,3 +43,4 @@
     user:
       name: vagrant
       group: docker
+
