@@ -1,6 +1,7 @@
 ---
 - hosts: all
   become: true
+  gather_facts: yes
 
   tasks:
   - name: Install packages that allow yum to be used over HTTPS
