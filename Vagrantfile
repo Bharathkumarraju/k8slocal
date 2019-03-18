@@ -25,7 +25,7 @@ Vagrant.configure("2") do |config|
      config.vm.box = "centos/7"
      config.vm.provision :shell, path: "bootstrap.sh"
      config.disksize.size = '42GB' 
-  config.ssh.insert_key = false
+     config.ssh.insert_key = false
  
  
   config.vm.define "k8s.master.com", primary: true do |master|
@@ -48,21 +48,21 @@ Vagrant.configure("2") do |config|
 
   (1..NUM_SLAVES).each do |i|
     hostname="k8s.node-#{i}.com"
-    config.vm.define hostname do |node|
-      node.vm.hostname = hostname
-      node.vm.network :private_network, ip: "#{SUBNET}.#{i+IP_BASE}"
-      node.vm.network :forwarded_port, guest: 22, host: (SSH_PORT_BASE+i), id: "ssh"
-      node.vm.provider :virtualbox do |v|
-        v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-        v.customize ["modifyvm", :id, "--memory", NODE_MEMORY]
-        v.customize ["modifyvm", :id, "--cpus", 2]
-        v.customize ["modifyvm", :id, "--name", hostname]
-      end
+     config.vm.define hostname do |node|
+       node.vm.hostname = hostname
+       node.vm.network :private_network, ip: "#{SUBNET}.#{i+IP_BASE}"
+       node.vm.network :forwarded_port, guest: 22, host: (SSH_PORT_BASE+i), id: "ssh"
+       node.vm.provider :virtualbox do |v|
+         v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+         v.customize ["modifyvm", :id, "--memory", NODE_MEMORY]
+         v.customize ["modifyvm", :id, "--cpus", 2]
+         v.customize ["modifyvm", :id, "--name", hostname]
+       end
     end
   end
+  
 
   if Vagrant.has_plugin?("vagrant-cachier")
     config.cache.scope = :box
-  end
-
- end
+  end 
+end
