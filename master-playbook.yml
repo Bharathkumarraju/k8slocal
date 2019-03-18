@@ -96,7 +96,7 @@
   - name: Disable swap
     command: swapoff -a
 
-  - name: Add yum repository for stable version
+  - name: Add yum kubernetes repository for stable version
     yum_repository:
       name: kubernetes 
       description: Kubernetes Repository
@@ -130,3 +130,9 @@
 
   - name: Initialize the Kubernetes cluster using kubeadm
     command: kubeadm init --apiserver-advertise-address="{{ masterip.stdout }}" --apiserver-cert-extra-sans="{{ masterip.stdout }}"  --node-name k8s.master.com --pod-network-cidr=192.168.0.0/16
+    register: k8scluster
+  
+  - name:  output of K8s cluster
+    debug:
+        msg: {{ k8scluster.stdout | to_nice_json }} 
+
