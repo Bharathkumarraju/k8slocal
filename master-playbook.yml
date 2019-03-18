@@ -134,5 +134,5 @@
   
   - name:  output of K8s cluster
     debug:
-        msg: {{ k8scluster.stdout | to_nice_json }} 
+        msg: "{{ k8scluster.stdout | to_nice_json }}"
 
