@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-##Script Author: BKR (DevOps Enabler :-) ##
+##Script Author: BKR (Cloud & DevOps Enabler :-) ##
 yum install -y epel-release
 yum install -y vim wget ansible
