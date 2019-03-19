@@ -158,6 +158,10 @@
     command: kubeadm token create --print-join-command
     register: join_command
 
+  - name: output of join_command
+    debug: 
+       msg: {{ join_command.stdout | to_nice_yaml }}
+
   - name: Copy join command to local file
     local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./join-command"
 
