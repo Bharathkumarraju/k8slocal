@@ -151,7 +151,7 @@
 
   - name: output of calico_network
     debug:
-      msg: {{ calico_network.stdout | to_nice_yaml }}
+      msg: "{{ calico_network.stdout | to_nice_yaml }}"
 
 
   - name: Generate join command
@@ -160,7 +160,7 @@
 
   - name: output of join_command
     debug: 
-       msg: {{ join_command.stdout | to_nice_yaml }}
+       msg: "{{ join_command.stdout | to_nice_yaml }}"
 
   - name: Copy join command to local file
     local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./join-command"
