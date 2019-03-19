@@ -146,6 +146,7 @@
      - chown vagrant:vagrant /home/vagrant/.kube/config 
 
   - name: Install calico pod network
+    become: false 
     command: kubectl create -f https://docs.projectcalico.org/v3.4/getting-started/kubernetes/installation/hosted/calico.yaml
     register: calico_network
 
