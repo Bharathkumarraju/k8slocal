@@ -59,7 +59,7 @@
       - yum-utils
 
 
-  - name: Add yum repository for stable version
+  - name: Add docker-ce yum repository for stable version
     become_method: sudo
     command: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
