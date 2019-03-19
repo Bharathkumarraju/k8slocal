@@ -42,6 +42,7 @@
     become_method: sudo
     command: sysctl -p
 
+
   - name: Install packages that allow yum to be used over HTTPS
     yum:
       name: "{{ packages }}"
@@ -51,11 +52,26 @@
       packages:
       - varnish 
       - ca-certificates
+      - device-mapper-persistent-data
       - curl
       - gnupg
-      - device-mapper-persistent-data
       - lvm2
       - yum-utils
+
+  - name: Remove the exisitng mirrors
+    find:
+      paths: /etc/yum.repos.d/
+      patterns: '*.repo,*.txt'
+      file_type: file
+      excludes: 'epel-testing.repo,epel.repo'
+    register: files_to_delete
+
+  - name: Remove the existing repos
+    file:
+      path: "{{ item.path }}"
+      state: absent
+    with_items: "{{ files_to_delete.files }}"
+
 
   - name: Add yum repository for stable version
     become_method: sudo
