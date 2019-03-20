@@ -1,0 +1,13 @@
+.vagrant
+.vagrant*
+.vagrant.*
+.vagrant/*
+.git
+.idea
+.idea.*
+.idea*
+*.iml
+join-command
+join-command*
+join-command.*
+

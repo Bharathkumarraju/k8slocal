@@ -1,0 +1,133 @@
+---
+- hosts: all
+  become: true
+  gather_facts: yes
+
+  tasks:
+  - name: Gather all facts
+    setup:
+        gather_subset:
+          - 'all'
+    register: res
+  - name: Display gathered facts
+    debug: var=res
+
+  - name: Disabling SELINUX
+    selinux:
+     state: disabled
+
+  - name: Run Setenforce command
+    become_method: sudo
+    command: setenforce 0
+    ignore_errors: True
+
+  - name: Flush existing firewall rules
+    become_method: sudo
+    iptables:
+      flush: true
+    ignore_errors: True
+
+  - name: Add the net bridge in sysctl
+    become_method: sudo
+    lineinfile:
+      path: /etc/sysctl.conf
+      regexp: '^net.bridge.bridge-nf-call-iptables='
+      line: 'net.bridge.bridge-nf-call-iptables=1'
+
+  - name: Add the kernel module
+    become_method: sudo
+    modprobe:
+      name:  br_netfilter
+      state: present
+
+  - name: execute sysctl
+    become_method: sudo
+    command: sysctl -p
+    ignore_errors: True
+
+
+  - name: Install packages that allow yum to be used over HTTPS
+    yum:
+      name: "{{ packages }}"
+      state: present
+      update_cache: yes
+    vars:
+      packages:
+      - varnish
+      - ca-certificates
+      - device-mapper-persistent-data
+      - curl
+      - gnupg
+      - lvm2
+      - yum-utils
+
+
+  - name: Add yum repository for stable version
+    become_method: sudo
+    command: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+  - name: Install docker and its dependecies
+    yum:
+      name: "{{ packages }}"
+      state: present
+      update_cache: yes
+    vars:
+      packages:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+
+  - name: Add vagrant user to docker group
+    user:
+      name: vagrant
+      group: docker
+
+  - name: Make sure a docker service is running
+    systemd:
+      state: started
+      name: docker
+      enabled: yes
+
+
+  - name: Remove swapfile from /etc/fstab
+    mount:
+      name: "{{ item }}"
+      fstype: swap
+      state: absent
+    with_items:
+      - swap
+      - none
+
+  - name: Disable swap
+    command: swapoff -a
+
+  - name: Add yum kubernetes repository for stable version
+    yum_repository:
+      name: kubernetes
+      description: Kubernetes Repository
+      baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+      gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+      state: present
+
+  - name: Install Kubernetes binaries
+    yum:
+      name: "{{ packages }}"
+      state: present
+      update_cache: yes
+    vars:
+      packages:
+        - kubelet
+        - kubeadm
+        - kubectl
+
+  - name: Make sure a kubelet service is running
+    systemd:
+      state: started
+      name: kubelet
+      enabled: yes
+
+  - name: Copy the join command to server location
+    copy: src=join-command dest=/tmp/join-command.sh mode=0777
+
+  - name: Join the node to cluster
+    command: sh /tmp/join-command.sh
