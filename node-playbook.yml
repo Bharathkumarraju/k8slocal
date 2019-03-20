@@ -124,7 +124,9 @@
       enabled: yes
 
   - name: Copy the join command to server location
+    become_method: sudo
     copy: src=join-command dest=/tmp/join-command.sh mode=0777
 
   - name: Join the node to cluster
+    become_method: sudo
     command: sh /tmp/join-command.sh
