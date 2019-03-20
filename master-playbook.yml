@@ -19,11 +19,13 @@
   - name: Run Setenforce command
     become_method: sudo
     command: setenforce 0
+    ignore_errors: True
 
   - name: Flush existing firewall rules
     become_method: sudo
     iptables:
       flush: true
+    ignore_errors: True
 
   - name: Add the net bridge in sysctl
     become_method: sudo
@@ -41,6 +43,7 @@
   - name: execute sysctl
     become_method: sudo
     command: sysctl -p
+    ignore_errors: True
 
 
   - name: Install packages that allow yum to be used over HTTPS
