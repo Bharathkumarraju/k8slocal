@@ -4,7 +4,7 @@ Automated local k8s setup
 ### Before you start make sure you install below components I am a Mac user ;)
 * Oracle virtualbox latest version https://download.virtualbox.org/virtualbox/6.0.4/VirtualBox-6.0.4-128413-OSX.dmg
 * Vagrant Latest version https://releases.hashicorp.com/vagrant/2.2.4/vagrant_2.2.4_x86_64.dmg
-* Install ansible using command "pip install ansible" 
+* Install ansible using command ```pip install ansible``` 
   * if you are strugglng to findout pip in windows just have look at here: https://stackoverflow.com/questions/29817447/how-to-run-pip-commands-from-cmd
 
 
