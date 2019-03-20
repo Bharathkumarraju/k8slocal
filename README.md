@@ -20,15 +20,11 @@ and MASTER_IP: 192.168.33.100  and NODE_IPS are 100+1 and so on i.e. 192.168.33.
 vagrant up
 ```
 
-### Login to VM boxes
+### Login to VM boxes this is just for your info
 ```
 vagrant ssh k8s.master.com    and vagrant ssh k8s.node-1.com , vagrant ssh k8s.node-2.com
 ```
 
-#### Graceful restart of VM's
-```
-vagrant reload --provision
-```
 
 ##### now time to see get nodes by loggining as below
 ```
