@@ -7,4 +7,7 @@
 .idea.*
 .idea*
 *.iml
+join-command
+join-command*
+join-command.*
 
