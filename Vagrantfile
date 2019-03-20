@@ -38,7 +38,7 @@ Vagrant.configure("2") do |config|
       v.customize ["modifyvm", :id, "--cpus", 3]
       v.customize ["modifyvm", :id, "--name", "k8s.master.com"]
     end
-    master.vm.provision "ansible_local" do |ansible|
+    master.vm.provision "ansible" do |ansible|
            ansible.verbose = "v" 
            ansible.become = true
            ansible.playbook = "master-playbook.yml"
@@ -58,7 +58,7 @@ Vagrant.configure("2") do |config|
          v.customize ["modifyvm", :id, "--cpus", 2]
          v.customize ["modifyvm", :id, "--name", hostname]
        end
-      node.vm.provision "ansible_local" do |ansible|
+      node.vm.provision "ansible" do |ansible|
            ansible.verbose = "v" 
            ansible.become = true
            ansible.playbook = "node-playbook.yml"
