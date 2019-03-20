@@ -58,6 +58,11 @@ Vagrant.configure("2") do |config|
          v.customize ["modifyvm", :id, "--cpus", 2]
          v.customize ["modifyvm", :id, "--name", hostname]
        end
+      node.vm.provision "ansible_local" do |ansible|
+           ansible.verbose = "v" 
+           ansible.become = true
+           ansible.playbook = "node-playbook.yml"
+      end
     end
   end
 end

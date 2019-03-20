@@ -12,7 +12,7 @@
   - name: Display gathered facts
     debug: var=res
 
-  - name: Disabling SELINUX 
+  - name: Disabling SELINUX
     selinux:
      state: disabled
 
@@ -50,7 +50,7 @@
       update_cache: yes
     vars:
       packages:
-      - varnish 
+      - varnish
       - ca-certificates
       - device-mapper-persistent-data
       - curl
@@ -59,12 +59,12 @@
       - yum-utils
 
 
-  - name: Add docker-ce yum repository for stable version
+  - name: Add yum repository for stable version
     become_method: sudo
     command: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
   - name: Install docker and its dependecies
-    yum: 
+    yum:
       name: "{{ packages }}"
       state: present
       update_cache: yes
@@ -82,10 +82,10 @@
   - name: Make sure a docker service is running
     systemd:
       state: started
-      name: docker 
+      name: docker
       enabled: yes
 
- 
+
   - name: Remove swapfile from /etc/fstab
     mount:
       name: "{{ item }}"
@@ -100,70 +100,31 @@
 
   - name: Add yum kubernetes repository for stable version
     yum_repository:
-      name: kubernetes 
+      name: kubernetes
       description: Kubernetes Repository
-      baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64 
-      gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg 
-      state: present 
+      baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+      gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+      state: present
 
   - name: Install Kubernetes binaries
-    yum: 
+    yum:
       name: "{{ packages }}"
       state: present
       update_cache: yes
     vars:
       packages:
-        - kubelet 
-        - kubeadm 
+        - kubelet
+        - kubeadm
         - kubectl
 
   - name: Make sure a kubelet service is running
     systemd:
       state: started
-      name: kubelet 
+      name: kubelet
       enabled: yes
 
-  - name: Set  Master IP
-    shell: ip a | grep -i "eth" | grep -i "inet" | grep "192" | awk '{print $2}' | awk -F'/' '{print $1}'
-    register: masterip
+  - name: Copy the join command to server location
+    copy: src=join-command dest=/tmp/join-command.sh mode=0777
 
-  - name: Get Master Ip
-    shell: echo "master ip is " {{ masterip.stdout }} 
-
-  - name: Initialize the Kubernetes cluster using kubeadm
-    command: kubeadm init --apiserver-advertise-address="{{ masterip.stdout }}" --apiserver-cert-extra-sans="{{ masterip.stdout }}"  --node-name k8s.master.com --pod-network-cidr=192.168.0.0/16
-    register: k8scluster
-  
-  - name:  output of K8s cluster
-    debug:
-        msg: "{{ k8scluster.stdout | to_nice_yaml }}"
-
-  - name: Setup kubeconfig for vagrant user
-    command: "{{ item }}"
-    with_items:
-     - mkdir -p /home/vagrant/.kube
-     - cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
-     - chown vagrant:vagrant /home/vagrant/.kube/config 
-
-  - name: Install calico pod network
-    become: false 
-    command: kubectl create -f https://docs.projectcalico.org/v3.4/getting-started/kubernetes/installation/hosted/calico.yaml
-    register: calico_network
-
-  - name: output of calico_network
-    debug:
-      msg: "{{ calico_network.stdout | to_nice_yaml }}"
-
-
-  - name: Generate join command
-    command: kubeadm token create --print-join-command
-    register: join_command
-
-  - name: output of join_command
-    debug: 
-       msg: "{{ join_command.stdout | to_nice_yaml }}"
-
-  - name: Copy join command to local file
-    local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./join-command"
-
-
+  - name: Join the node to cluster
+    command: sh /tmp/join-command.sh
