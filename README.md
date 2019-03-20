@@ -29,3 +29,18 @@ vagrant ssh k8s.master.com    and vagrant ssh k8s.node-1.com , vagrant ssh k8s.n
 ```
 vagrant reload --provision
 ```
+
+##### now time to see get nodes by loggining as below
+```
+bharathumarsAir:k8slocal bharathkumardasararaju$ vagrant ssh k8s.master.com
+Last login: Wed Mar 20 14:25:16 2019 from 10.0.2.2
+-bash: warning: setlocale: LC_CTYPE: cannot change locale (UTF-8): No such file or directory
+[vagrant@k8s ~]$ kubectl get nodes -o wide
+NAME             STATUS   ROLES    AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                KERNEL-VERSION              CONTAINER-RUNTIME
+k8s.master.com   Ready    master   43m   v1.13.4   10.0.2.15     <none>        CentOS Linux 7 (Core)   3.10.0-957.5.1.el7.x86_64   docker://18.9.3
+k8s.node-1.com   Ready    <none>   30m   v1.13.4   10.0.2.15     <none>        CentOS Linux 7 (Core)   3.10.0-957.5.1.el7.x86_64   docker://18.9.3
+k8s.node-2.com   Ready    <none>   15m   v1.13.4   10.0.2.15     <none>        CentOS Linux 7 (Core)   3.10.0-957.5.1.el7.x86_64   docker://18.9.3
+[vagrant@k8s ~]$
+```
+
+
